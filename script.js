@@ -1,4 +1,21 @@
-// "use strict";
+const options = { probabilityThreshold: 0.7 };
+const classifier = ml5.soundClassifier('SpeechCommands18w', options, modelReady);
+let direction
+
+function modelReady() {
+  // classify sound
+  classifier.classify(gotResult);
+}
+
+function gotResult(error, result) {
+  if (error) {
+    console.log(error);
+    return;
+  }
+  // log the result
+  direction = result[0].label
+  console.log(result[0].label);
+}
 
 var canvas = document.getElementById('snake');
 var ctx = canvas.getContext('2d');
@@ -22,7 +39,6 @@ function drawCanvas(){
   ctx.fillStyle = '#fff';
   ctx.fillRect(0,0,w,h);
 }
-
 
 /************* SNAKE ****************/
 function buildSnake(){
@@ -86,20 +102,17 @@ var food = function(){
 }
 var fd = new food();
 
-
 /************** KEYBOARD EVENTS ****************/
-document.onkeydown = function(e){
-  var key = e.keyCode;
-  if(key == "37" && dir !== "right"){ setTimeout(function(){ dir = "left"; }, 30) }
-  if(key == "38" && dir !== "down"){ setTimeout(function(){ dir = "up"; }, 30) }
-  if(key == "39" && dir !== "left"){ setTimeout(function(){ dir = "right"; }, 30) }
-  if(key == "40" && dir !== "up"){ setTimeout(function(){ dir = "down"; }, 30) }
-
-  if(key == "27" || key == "80"){ fnPause(); } /* Key 'ESC' or 'P' */
-
-  if(key){ e.preventDefault(); }
+async function movement(){
+  while (true){
+    await new Promise(resolve => setTimeout(resolve, 50));
+    if(direction == "left" && dir !== "right"){ setTimeout(function(){ dir = "left"; }, 30) }
+    if(direction == "up" && dir !== "down"){ setTimeout(function(){ dir = "up"; }, 30) }
+    if(direction == "right" && dir !== "left"){ setTimeout(function(){ dir = "right"; }, 30) }
+    if(direction == "down" && dir !== "up"){ setTimeout(function(){ dir = "down"; }, 30) }
+  }
 }
-
+movement()
 
 /*************** FUNCTIONS ******************/
 var go = document.querySelector('.gameOver');
